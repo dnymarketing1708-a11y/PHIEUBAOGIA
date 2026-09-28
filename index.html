@@ -198,22 +198,48 @@
     </div>
     </div>
   </main>
-  <footer class="toolbar"><span id="pageStatus" style="margin-right:auto;align-self:center">A4 · 1 trang</span><button class="secondary" type="button" id="recalculate">Tính lại tự động</button><button class="primary" type="button" onclick="window.print()">In / Lưu PDF</button></footer>
+  <footer class="toolbar"><span id="pageStatus" style="margin-right:auto;align-self:center">A4 · 1 trang</span><button class="secondary" type="button" id="saveHtml">Lưu thành file HTML</button><button class="secondary" type="button" id="recalculate">Tính lại tự động</button><button class="primary" type="button" onclick="window.print()">In / Lưu PDF</button></footer>
   <script>
     const rows = document.getElementById('productRows'), money = n => new Intl.NumberFormat('vi-VN').format(Math.round(n || 0)) + ' ₫';
     const number = value => Math.max(0, Number(String(value).replace(/[^0-9.-]/g,'')) || 0);
-    const product = (name='', unit='Bộ', qty=1, price=0) => {
+    const product = (name='', unit='Bộ', qty=1, price=0, photoSource='') => {
       const tr=document.createElement('tr'); tr.innerHTML=`<td class="photo-cell"><label class="photo"><span>+ Thêm ảnh</span><input class="file-input" type="file" accept="image/*"></label></td><td><input class="item-name" value="${name}" placeholder="Tên sản phẩm, màu sắc, size..."></td><td><input value="${unit}"></td><td><input class="quantity" type="number" min="0" value="${qty}"></td><td><input class="price money" inputmode="numeric" value="${price}"></td><td class="total-cell"><input class="line-total" readonly></td><td class="actions"><button class="remove" type="button" title="Xóa mặt hàng">×</button></td>`;
-      tr.querySelector('.file-input').addEventListener('change', e=>{ const file=e.target.files[0]; if(file){ const photo=tr.querySelector('.photo'); photo.style.backgroundImage=`url(${URL.createObjectURL(file)})`; photo.classList.add('has-image'); } });
+      if(photoSource){ const photo=tr.querySelector('.photo'); photo.style.backgroundImage=`url(${photoSource})`; photo.classList.add('has-image'); }
+      tr.querySelector('.file-input').addEventListener('change', async e=>{ const file=e.target.files[0]; if(file){ const photo=tr.querySelector('.photo'); photo.style.backgroundImage=`url(${await fileToDataUrl(file)})`; photo.classList.add('has-image'); } });
       tr.querySelectorAll('.quantity,.price').forEach(i=>i.addEventListener('input', calculate)); tr.querySelector('.remove').onclick=()=>{tr.remove();calculate()}; rows.append(tr);
     };
     function calculate(){ let sub=0; rows.querySelectorAll('tr').forEach(tr=>{const total=number(tr.querySelector('.quantity').value)*number(tr.querySelector('.price').value);tr.querySelector('.line-total').value=money(total);sub+=total}); const disc=number(document.getElementById('discount').value), vat=number(document.getElementById('vat').value), manual=document.getElementById('manualTotal').value.trim(), grand=manual ? number(manual) : Math.max(0,sub-disc)*(1+vat/100), sampleDeposit=number(document.getElementById('sampleDeposit').value), rate=Math.min(100,number(document.getElementById('depositRate').value)), deposit=Math.min(grand,sampleDeposit+(grand*rate/100)); document.getElementById('subtotal').textContent=money(sub); document.getElementById('grandTotal').textContent=money(grand); document.getElementById('depositTotal').textContent=money(deposit); document.getElementById('remainingTotal').textContent=money(Math.max(0,grand-deposit)); }
     document.getElementById('addProduct').onclick=()=>{product();calculate()}; document.getElementById('recalculate').onclick=()=>{document.getElementById('manualTotal').value='';calculate()}; ['discount','vat','manualTotal','sampleDeposit','depositRate'].forEach(id=>document.getElementById(id).oninput=calculate);
-    document.getElementById('quoteDate').value=new Date().toISOString().slice(0,10);
+    if(!window.__quoteSnapshot) document.getElementById('quoteDate').value=new Date().toISOString().slice(0,10);
     const imageControls='<div class="image-controls"><button type="button" class="move-left" title="Đưa ảnh sang trái">←</button><button type="button" class="move-right" title="Đưa ảnh sang phải">→</button><button type="button" class="delete-image" title="Xóa ảnh">×</button></div>';
-    document.getElementById('showcaseUpload').addEventListener('change', event => { [...event.target.files].forEach((file,index) => { const figure=document.createElement('figure'); figure.className='product-showcase'; figure.innerHTML=`${imageControls}<img src="${URL.createObjectURL(file)}" alt="Hình ảnh sản phẩm ${index+1}"><figcaption>Hình ảnh sản phẩm minh họa</figcaption>`; document.getElementById('showcaseGallery').append(figure); }); event.target.value=''; });
+    const fileToDataUrl = file => new Promise((resolve,reject) => { const reader=new FileReader(); reader.onload=()=>resolve(reader.result); reader.onerror=reject; reader.readAsDataURL(file); });
+    const sourceToDataUrl = async source => { if(source.startsWith('data:')) return source; try { const response=await fetch(source); if(!response.ok) throw new Error('Không tải được ảnh'); return fileToDataUrl(await response.blob()); } catch { return source; } };
+    document.getElementById('showcaseUpload').addEventListener('change', async event => { for(const [index,file] of [...event.target.files].entries()){ const figure=document.createElement('figure'); figure.className='product-showcase'; figure.innerHTML=`${imageControls}<img src="${await fileToDataUrl(file)}" alt="Hình ảnh sản phẩm ${index+1}"><figcaption>Hình ảnh sản phẩm minh họa</figcaption>`; document.getElementById('showcaseGallery').append(figure); } event.target.value=''; });
     document.getElementById('showcaseGallery').addEventListener('click', event => { const button=event.target.closest('button'), card=event.target.closest('.product-showcase'); if(!button || !card) return; const gallery=card.parentElement; if(button.classList.contains('delete-image')) card.remove(); if(button.classList.contains('move-left') && card.previousElementSibling) gallery.insertBefore(card,card.previousElementSibling); if(button.classList.contains('move-right') && card.nextElementSibling) gallery.insertBefore(card.nextElementSibling,card); });
-    product('Áo thể thao cổ tròn', 'Cái', 20, 125000); product('Quần thể thao', 'Cái', 20, 115000); product('Bộ thể thao thi đấu', 'Bộ', 15, 265000); calculate();
+    const restoreSnapshot = snapshot => {
+      if(!snapshot) return false;
+      rows.replaceChildren();
+      snapshot.products.forEach(item=>product(item.name,item.unit,item.qty,item.price,item.photo));
+      document.querySelectorAll('input:not([type=file])').forEach((input,index)=>{ if(snapshot.inputs[index] !== undefined) input.value=snapshot.inputs[index]; });
+      const gallery=document.getElementById('showcaseGallery'); gallery.replaceChildren();
+      snapshot.gallery.forEach(item=>{ const figure=document.createElement('figure'); figure.className='product-showcase'; figure.innerHTML=`${imageControls}<img src="${item.src}" alt="${item.alt}"><figcaption>${item.caption}</figcaption>`; gallery.append(figure); });
+      calculate(); return true;
+    };
+    const defaultProducts = () => { product('Áo thể thao cổ tròn', 'Cái', 20, 125000); product('Quần thể thao', 'Cái', 20, 115000); product('Bộ thể thao thi đấu', 'Bộ', 15, 265000); calculate(); };
+    restoreSnapshot(window.__quoteSnapshot) || defaultProducts();
+    document.getElementById('saveHtml').addEventListener('click', async () => {
+      const saveButton=document.getElementById('saveHtml'); saveButton.disabled=true; saveButton.textContent='Đang chuẩn bị…';
+      try {
+        const products=await Promise.all([...rows.querySelectorAll('tr')].map(async tr=>{ const photo=tr.querySelector('.photo'); const match=photo.style.backgroundImage.match(/url\(["']?(.*?)["']?\)/); return { name:tr.querySelector('.item-name').value, unit:tr.querySelector('td:nth-child(3) input').value, qty:tr.querySelector('.quantity').value, price:tr.querySelector('.price').value, photo:match ? await sourceToDataUrl(match[1]) : '' }; }));
+        const gallery=await Promise.all([...document.querySelectorAll('.product-showcase')].map(async figure=>({ src:await sourceToDataUrl(figure.querySelector('img').src), alt:figure.querySelector('img').alt, caption:figure.querySelector('figcaption').textContent })));
+        const snapshot={ products, gallery, inputs:[...document.querySelectorAll('input:not([type=file])')].map(input=>input.value) };
+        saveButton.disabled=false; saveButton.textContent='Lưu thành file HTML';
+        const snapshotTag='<script>window.__quoteSnapshot='+JSON.stringify(snapshot).replace(/</g,'\\u003c')+';</'+'script>';
+        const savedHtml='<!doctype html>\n'+document.documentElement.outerHTML.replace('<script>',snapshotTag+'<script>');
+        const link=document.createElement('a'); link.href=URL.createObjectURL(new Blob([savedHtml],{type:'text/html;charset=utf-8'})); link.download=`bao-gia-${(document.querySelector('.quote-no input').value || 'DNY').replace(/[^a-z0-9_-]/gi,'-')}.html`; link.click(); URL.revokeObjectURL(link.href);
+      } catch(error) { alert('Không thể lưu file HTML. Vui lòng thử lại.'); console.error(error); }
+      finally { saveButton.disabled=false; saveButton.textContent='Lưu thành file HTML'; }
+    });
     const pageBody=document.querySelector('.page-body');
     function fitA4(){
       const availableHeight=281*96/25.4;
