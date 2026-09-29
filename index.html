@@ -72,6 +72,12 @@
     .replace-image { display:inline-grid; place-items:center; width:42px; height:42px; margin:10px 0 14px; color:var(--blue); background:#fff; border:1px dashed var(--blue); border-radius:6px; font-weight:bold; font-size:1.6rem; line-height:1; cursor:pointer; }
     .replace-image:hover { background:#eaf6fb; }
     .replace-image input { display:none; }
+    .image-source-picker { position:relative; display:inline-block; }
+    .image-source-menu { position:absolute; z-index:5; top:52px; left:0; width:190px; padding:8px; border:1px solid var(--line); border-radius:7px; background:#fff; box-shadow:0 5px 16px #1234; }
+    .image-source-menu[hidden] { display:none; }
+    .image-source-menu button { display:block; width:100%; padding:7px 8px; border:0; border-radius:4px; background:transparent; color:var(--ink); text-align:left; font-size:.82rem; }
+    .image-source-menu button:hover { background:#f8e8ea; color:var(--blue); }
+    .image-source-menu p { margin:6px 8px 1px; color:#617283; font-size:.7rem; }
     .summary { width:100%; border-top:3px solid var(--ink); background:#fffafb; padding:0 12px 10px; border-radius:0 0 7px 7px; }
     .summary-row { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding:12px 0; gap:14px; line-height:1.45; }
     .summary-row input { width:170px; text-align:right; border:0; border-bottom:1px solid var(--line); padding:6px 2px; font:inherit; }
@@ -81,18 +87,22 @@
     input#depositTotal { width:170px; text-align:right; color:#a80f22; font-weight:800; border:0; border-bottom:1px solid #d93a48; padding:6px 2px; font:inherit; }
     .deposit-box { margin:13px -3px 0; padding:7px 12px 10px; border:2px solid #d93a48; border-radius:7px; background:linear-gradient(135deg,#fff7df,#fff0f2); box-shadow:0 5px 14px #a5152430; }
     .deposit-box .summary-row:last-of-type { border-bottom:0; }
+    .deposit-label { display:flex; align-items:center; gap:3px; font-weight:700; }
+    .deposit-rate { width:34px!important; min-width:0!important; padding:1px 0!important; text-align:center!important; color:#8c2330; font-weight:700; border-bottom:1px solid #d93a48!important; }
     .deposit-box .manual-note { margin-bottom:0; font-weight:600; color:#8c2330; }
     .manual-note { color:#617283; font-size:.78rem; margin:10px 0 0; text-align:right; }
     .bottom { margin-top:35px; display:grid; grid-template-columns:1.3fr .7fr; gap:40px; border-top:1px solid var(--line); padding-top:22px; }
     .terms { line-height:1.55; color:#465a6b; font-size:.91rem; }.terms h3 { color:var(--ink); margin:0 0 8px; }.terms [contenteditable="true"] { font-weight:700; color:var(--ink); }
     .notice-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:30px; border-top:1px solid var(--line); padding-top:22px; }
-    .notice { border-left:4px solid var(--blue); background:#f5f9fc; padding:14px 16px; font-size:.88rem; line-height:1.5; }
-    .notice:first-child { border-left-color:#d71920; background:#fff0f1; color:#8b1118; }
-    .notice:first-child h3, .notice:first-child strong { color:#b10f19; }
-    .notice.delivery { border-left-color:#d71920; background:#fff0f1; color:#8b1118; }
-    .notice.delivery h3, .notice.delivery strong { color:#b10f19; }
+    .notice { border-left:4px solid #c83f4e; background:#eeeeee; padding:14px 16px; font-size:.88rem; line-height:1.5; color:#3d3334; font-weight:600; }
+    .notice:first-child { border-left-color:#c83f4e; background:#eeeeee; color:#3d3334; }
+    .notice:first-child h3, .notice:first-child strong { color:#a51d2a; font-weight:800; }
+    .notice.delivery { border-left-color:#c83f4e; background:#eeeeee; color:#3d3334; }
+    .notice.delivery h3, .notice.delivery strong { color:#a51d2a; font-weight:800; }
     .notice h3 { margin:0 0 7px; font-size:.95rem; }.notice p { margin:0 0 7px; }.notice ul { margin:3px 0 8px; padding-left:18px; }
-    .payment-qr { text-align:center; display:flex; flex-direction:column; align-items:center; }.payment-qr strong { display:block; margin-bottom:7px; }.payment-qr span { font-size:.85rem; color:#617283; }.payment-qr img { width:118px; height:118px; object-fit:contain; border:1px solid var(--line); padding:3px; background:#fff; }
+    .payment-details { display:grid; grid-template-columns:130px minmax(0,1fr); align-items:start; gap:12px; margin-top:10px; }
+    .payment-qr { text-align:center; display:flex; flex-direction:column; align-items:center; }.payment-qr strong { display:block; margin-bottom:5px; white-space:nowrap; }.payment-qr span { font-size:.78rem; color:#617283; }.payment-qr img { width:100px; height:100px; object-fit:contain; border:1px solid var(--line); padding:3px; background:#fff; }
+    .bank-info { display:flex; align-items:center; min-height:100%; }.bank-info img { display:block; width:100%; max-width:205px; height:auto; object-fit:contain; }
     .toolbar { position:sticky; bottom:0; display:flex; justify-content:flex-end; gap:10px; padding:16px 46px; background:#f7fbfd; border-top:1px solid var(--line); }
     .primary { background:var(--warm); color:#29200d; border:0; padding:11px 18px; border-radius:5px; font-weight:bold; }.secondary { background:white; border:1px solid var(--line); padding:10px 15px; border-radius:5px; }
     @media (max-width:680px) { .sheet { width:100%; margin:0; border-radius:0; }.top,.content,.toolbar { padding-left:20px; padding-right:20px; }.top { display:block; }.quote-no { text-align:left; margin-top:20px; }.quote-no input { text-align:left; }.info-grid,.bottom,.notice-grid,.quote-bottom { grid-template-columns:1fr; }.summary { width:100%; } h1 { font-size:1.75rem; } }
@@ -179,7 +189,9 @@
     .manual-note,.deposit-box .manual-note { font-size:9px; margin:5px 0 0; }
     .bottom { grid-template-columns:1fr; margin-top:0; padding-top:0; gap:18px; border-top:0; }
     .terms { font-size:11px; line-height:1.4; }.terms h3 { font-size:12px; margin-bottom:4px; }
-    .payment-qr { width:158px; margin-top:8px; }.payment-qr strong { font-size:12px; margin-bottom:4px; }.payment-qr span { font-size:10px; }.payment-qr img { width:158px; height:158px; padding:2px; }
+    .payment-details { grid-template-columns:130px minmax(0,1fr); gap:8px; margin-top:8px; }
+    .payment-qr { width:130px; }.payment-qr strong { font-size:11px; margin-bottom:3px; }.payment-qr span { font-size:9px; }.payment-qr img { width:112px; height:112px; padding:2px; }
+    .bank-info img { max-width:190px; }
     .notice-grid { grid-template-columns:1fr 1fr; margin-top:10px; padding-top:8px; gap:12px; }
     .notice { padding:7px 9px; font-size:10px; line-height:1.35; }
     .notice h3 { font-size:11px; margin-bottom:4px; }.notice p,.notice ul { margin:0 0 4px; }
@@ -214,8 +226,8 @@
       </section>
       <div class="section-title"><h2>Danh mục báo giá</h2><span class="hint">Bấm vào ảnh để thêm hình sản phẩm</span></div>
       <div class="products"><table><thead><tr><th>Hình</th><th>Sản phẩm / Mô tả</th><th>Đơn vị</th><th>SL</th><th>Đơn giá (₫)</th><th>Thành tiền (₫)</th><th></th></tr></thead><tbody id="productRows"></tbody></table></div>
-      <div class="quote-bottom"><div class="showcase-actions"><button class="add" id="addProduct" type="button" hidden>+ Thêm mặt hàng</button><div class="product-gallery" id="showcaseGallery"><figure class="product-showcase"><div class="image-controls"><button type="button" class="edit-image" hidden></button><button type="button" class="delete-image" title="Xóa ảnh">×</button></div><div class="image-frame"><img src="assets/san-pham-the-thao.png" alt="Mẫu trang phục thể thao"></div><figcaption>Hình ảnh sản phẩm minh họa</figcaption></figure></div><label class="replace-image" title="Thêm ảnh minh họa" aria-label="Thêm ảnh minh họa">+<input id="showcaseUpload" type="file" accept="image/*" multiple></label><div class="terms terms-inline"><h3>Điều khoản báo giá</h3><div contenteditable="true">• Báo giá có hiệu lực trong 07 ngày kể từ ngày lập.<br>• Thời gian giao hàng: 7–14 ngày sau khi duyệt mẫu và đặt cọc.<br>• Đơn giá đã bao gồm công may; chưa bao gồm phí vận chuyển (nếu có).</div></div></div>
-      <div class="payment-column"><section class="summary" aria-label="Tổng thanh toán"><div class="summary-row"><span>Tạm tính</span><strong id="subtotal">0 ₫</strong></div><div class="summary-row"><span>Chiết khấu (₫)</span><input id="discount" type="number" min="0" value="0"></div><div class="summary-row"><span>VAT (%)</span><input id="vat" type="number" min="0" value="0"></div><div class="summary-row"><span>Phụ Thu (nếu có)</span><input id="manualTotal" inputmode="numeric" placeholder="Để trống để tự tính"></div><div class="summary-row grand"><span>TỔNG THANH TOÁN</span><strong id="grandTotal">0 ₫</strong></div><div class="deposit-box"><div class="summary-row"><span>Cọc mẫu (₫)</span><input id="sampleDeposit" type="number" min="0" value="0"></div><div class="summary-row"><span>Cọc trước (%)</span><input id="depositRate" type="number" min="0" max="100" value="40"></div><div class="summary-row"><span>TIỀN CỌC</span><input id="depositTotal" inputmode="numeric" aria-label="Tiền cọc"></div><div class="summary-row"><span>CÒN LẠI</span><strong id="remainingTotal">0 ₫</strong></div><p class="manual-note">Tự tính theo cọc mẫu và tỷ lệ cọc trước. Có thể nhập lại tiền cọc khi cần.</p></div></section><div class="payment-qr"><strong>MÃ QR THANH TOÁN</strong><img src="assets/ma-qr-thanh-toan.png" alt="Mã QR thanh toán"><span>Quét mã để thanh toán</span></div></div></div>
+      <div class="quote-bottom"><div class="showcase-actions"><button class="add" id="addProduct" type="button" hidden>+ Thêm mặt hàng</button><div class="product-gallery" id="showcaseGallery"><figure class="product-showcase"><div class="image-controls"><button type="button" class="edit-image" hidden></button><button type="button" class="delete-image" title="Xóa ảnh">×</button></div><div class="image-frame"><img src="assets/san-pham-the-thao.png" alt="Mẫu trang phục thể thao"></div><figcaption>Hình ảnh sản phẩm minh họa</figcaption></figure></div><div class="image-source-picker"><button class="replace-image" id="addShowcaseImage" type="button" title="Thêm ảnh minh họa" aria-label="Thêm ảnh minh họa">+</button><input id="showcaseUpload" type="file" accept="image/*" multiple hidden><div class="image-source-menu" id="imageSourceMenu" hidden><button type="button" id="chooseImageFile">Chọn ảnh từ máy</button><button type="button" id="pasteClipboardImage">Dán ảnh từ clipboard</button><p>Hoặc nhấn Ctrl+V tại đây</p></div></div><div class="field size-note"><label>Ghi chú số lượng / size khách đặt</label><textarea placeholder="Ví dụ: Size S: 10 áo · Size M: 15 áo · Size L: 8 áo"></textarea></div><div class="terms terms-inline"><h3>Điều khoản báo giá</h3><div contenteditable="true">• Báo giá có hiệu lực trong 07 ngày kể từ ngày lập.<br>• Thời gian giao hàng: 7–14 ngày sau khi duyệt mẫu và đặt cọc.<br>• Đơn giá đã bao gồm công may; chưa bao gồm phí vận chuyển (nếu có).</div></div></div>
+      <div class="payment-column"><section class="summary" aria-label="Tổng thanh toán"><div class="summary-row"><span>Tạm tính</span><strong id="subtotal">0 ₫</strong></div><div class="summary-row"><span>Chiết khấu (₫)</span><input id="discount" type="number" min="0" value="0"></div><div class="summary-row"><span>VAT (%)</span><input id="vat" type="number" min="0" value="0"></div><div class="summary-row"><span>Phụ Thu (nếu có)</span><input id="manualTotal" inputmode="numeric" placeholder="Để trống để tự tính"></div><div class="summary-row grand"><span>TỔNG THANH TOÁN</span><strong id="grandTotal">0 ₫</strong></div><div class="deposit-box"><div class="summary-row"><span>Cọc mẫu (₫)</span><input id="sampleDeposit" type="number" min="0" value="0"></div><div class="summary-row"><span class="deposit-label">TIỀN CỌC (<input id="depositRate" class="deposit-rate" type="number" min="0" max="100" value="40" aria-label="Tỷ lệ cọc trước">%)</span><input id="depositTotal" inputmode="numeric" aria-label="Tiền cọc"></div><div class="summary-row"><span>CÒN LẠI</span><strong id="remainingTotal">0 ₫</strong></div><p class="manual-note">Tự tính theo cọc mẫu và tỷ lệ cọc trước. Có thể nhập lại tiền cọc khi cần.</p></div></section><div class="payment-details"><div class="payment-qr"><strong>MÃ QR THANH TOÁN</strong><img src="assets/ma-qr-thanh-toan.png" alt="Mã QR thanh toán"><span>Quét mã để thanh toán</span></div><div class="bank-info"><img src="assets/thong-tin-tai-khoan-ocb.png" alt="Thông tin tài khoản OCB: Công ty TNHH May Mặc Đạt Như Ý, số tài khoản 888589"></div></div></div></div>
       <section class="notice-grid" aria-label="Lưu ý và chính sách vận chuyển">
         <div class="notice"><h3>Lưu ý duyệt mẫu</h3><p><strong>Mẫu thiết kế chỉ là sản phẩm minh họa</strong>, có thể có độ chênh lệch sai số về màu sắc, tỉ lệ.</p><p>Quý khách vui lòng <strong>kiểm tra kỹ nội dung, chính tả, logo</strong> trên thiết kế.</p><p><strong>DNY không chịu trách nhiệm</strong> cho các lỗi sai khi đã duyệt mẫu. Vui lòng dành thời gian kiểm tra lại nội dung thật kỹ để tránh sai sót.</p></div>
         <div class="notice delivery"><h3>Chính sách hỗ trợ phí vận chuyển</h3><p><strong>Đơn hàng trên 3 triệu:</strong></p><ul><li>Hỗ trợ một phần phí vận chuyển cho khách ở các tỉnh.</li><li>Miễn phí vận chuyển cho khách trong nội thành TP.HCM (bán kính 10km).</li></ul><p><strong>Đơn hàng dưới 3 triệu:</strong></p><ul><li>Gửi GHTK; quý khách vui lòng thanh toán phí vận chuyển giúp bên em.</li></ul></div>
@@ -223,7 +235,8 @@
     </div>
     </div>
   </main>
-  <footer class="toolbar"><span id="pageStatus" style="margin-right:auto;align-self:center">A4 · 1 trang</span><button class="secondary" type="button" id="saveHtml">Lưu thành file HTML</button><button class="secondary" type="button" id="recalculate">Tính lại tự động</button><button class="primary" type="button" onclick="window.print()">In / Lưu PDF</button></footer>
+  <footer class="toolbar"><span id="pageStatus" style="margin-right:auto;align-self:center">A4 · 1 trang</span><button class="secondary" type="button" id="saveHtml">Lưu thành file HTML</button><button class="secondary" type="button" id="exportJpg">Tải ảnh JPG</button><button class="secondary" type="button" id="recalculate">Tính lại tự động</button><button class="primary" type="button" onclick="window.print()">In / Lưu PDF</button></footer>
+  <script src="assets/html2canvas.min.js"></script>
   <script>
     const rows = document.getElementById('productRows'), money = n => new Intl.NumberFormat('vi-VN').format(Math.round(n || 0)) + ' ₫';
     const number = value => Math.max(0, Number(String(value).replace(/[^0-9.-]/g,'')) || 0);
@@ -246,7 +259,14 @@
     const createShowcase = (src,alt,caption,adjustment={}) => { const figure=document.createElement('figure'); figure.className='product-showcase'; figure.innerHTML=`${imageControls}<div class="image-frame"><img src="${src}" alt="${alt}"></div><figcaption>${caption}</figcaption>`; if(adjustment.adjusted){ figure.dataset.adjusted='true'; figure.style.width=adjustment.width||''; figure.style.setProperty('--image-height',adjustment.height||''); figure.style.setProperty('--image-zoom',adjustment.zoom||''); figure.style.setProperty('--image-x',adjustment.x||''); figure.style.setProperty('--image-y',adjustment.y||''); } if(adjustment.floating){ figure.classList.add('floating'); figure.style.left=adjustment.left||'0px'; figure.style.top=adjustment.top||'0px'; } setupShowcase(figure); return figure; };
     const fileToDataUrl = file => new Promise((resolve,reject) => { const reader=new FileReader(); reader.onload=()=>resolve(reader.result); reader.onerror=reject; reader.readAsDataURL(file); });
     const sourceToDataUrl = async source => { if(source.startsWith('data:')) return source; try { const response=await fetch(source); if(!response.ok) throw new Error('Không tải được ảnh'); return fileToDataUrl(await response.blob()); } catch { return source; } };
-    document.getElementById('showcaseUpload').addEventListener('change', async event => { for(const [index,file] of [...event.target.files].entries()) document.getElementById('showcaseGallery').append(createShowcase(await fileToDataUrl(file),`Hình ảnh sản phẩm ${index+1}`,'Hình ảnh sản phẩm minh họa')); event.target.value=''; });
+    const imageSourceMenu=document.getElementById('imageSourceMenu'), showcaseUpload=document.getElementById('showcaseUpload');
+    const appendShowcaseImages=async files=>{ for(const [index,file] of [...files].entries()) { if(file.type?.startsWith('image/')) document.getElementById('showcaseGallery').append(createShowcase(await fileToDataUrl(file),`Hình ảnh sản phẩm ${index+1}`,'Hình ảnh sản phẩm minh họa')); } imageSourceMenu.hidden=true; };
+    document.getElementById('addShowcaseImage').onclick=()=>{ imageSourceMenu.hidden=!imageSourceMenu.hidden; };
+    document.getElementById('chooseImageFile').onclick=()=>showcaseUpload.click();
+    showcaseUpload.addEventListener('change', async event=>{ await appendShowcaseImages(event.target.files); event.target.value=''; });
+    const pasteImageFromClipboard=async()=>{ try { const items=await navigator.clipboard.read(); for(const item of items){ const imageType=item.types.find(type=>type.startsWith('image/')); if(imageType){ await appendShowcaseImages([await item.getType(imageType)]); return; } } alert('Clipboard chưa có ảnh. Hãy sao chép ảnh rồi thử lại.'); } catch { alert('Không thể đọc clipboard. Hãy nhấn Ctrl+V khi bảng chọn đang mở.'); } };
+    document.getElementById('pasteClipboardImage').onclick=pasteImageFromClipboard;
+    document.addEventListener('paste', async event=>{ if(imageSourceMenu.hidden) return; const images=[...event.clipboardData.files].filter(file=>file.type.startsWith('image/')); if(images.length){ event.preventDefault(); await appendShowcaseImages(images); } });
     document.getElementById('showcaseGallery').addEventListener('click', event => { const button=event.target.closest('button'), card=event.target.closest('.product-showcase'); if(!button || !card) return; const gallery=card.parentElement; if(button.classList.contains('delete-image')) card.remove(); if(button.classList.contains('move-left') && card.previousElementSibling) gallery.insertBefore(card,card.previousElementSibling); if(button.classList.contains('move-right') && card.nextElementSibling) gallery.insertBefore(card.nextElementSibling,card); });
     const restoreSnapshot = snapshot => {
       if(!snapshot) return false;
@@ -271,6 +291,16 @@
         const link=document.createElement('a'); link.href=URL.createObjectURL(new Blob([savedHtml],{type:'text/html;charset=utf-8'})); link.download=`bao-gia-${(document.querySelector('.quote-no input').value || 'DNY').replace(/[^a-z0-9_-]/gi,'-')}.html`; link.click(); URL.revokeObjectURL(link.href);
       } catch(error) { alert('Không thể lưu file HTML. Vui lòng thử lại.'); console.error(error); }
       finally { saveButton.disabled=false; saveButton.textContent='Lưu thành file HTML'; }
+    });
+    document.getElementById('exportJpg').addEventListener('click', async () => {
+      const exportButton=document.getElementById('exportJpg'); exportButton.disabled=true; exportButton.textContent='Đang tạo ảnh…';
+      try {
+        const canvas=await html2canvas(document.querySelector('.page-body'),{backgroundColor:'#ffffff',scale:2,useCORS:true,logging:false,ignoreElements:element=>element.matches('.image-controls,.image-editor,.crop-handle,.replace-image,.image-source-picker,.add,.remove,.hint'),onclone:clonedDocument=>{ const clonedBody=clonedDocument.querySelector('.page-body'); clonedBody.style.zoom='1'; clonedBody.style.transform='none'; }});
+        const border=Math.round(8*96/25.4*2), jpgCanvas=document.createElement('canvas'); jpgCanvas.width=canvas.width+border*2; jpgCanvas.height=canvas.height+border*2;
+        const jpgContext=jpgCanvas.getContext('2d'); jpgContext.fillStyle='#ffffff'; jpgContext.fillRect(0,0,jpgCanvas.width,jpgCanvas.height); jpgContext.drawImage(canvas,border,border);
+        const link=document.createElement('a'); link.href=jpgCanvas.toDataURL('image/jpeg',.95); link.download=`bao-gia-${(document.querySelector('.quote-no input').value || 'DNY').replace(/[^a-z0-9_-]/gi,'-')}.jpg`; link.click();
+      } catch(error) { alert('Không thể tạo ảnh JPG. Vui lòng thử lại trong Chrome hoặc Edge.'); console.error(error); }
+      finally { exportButton.disabled=false; exportButton.textContent='Tải ảnh JPG'; }
     });
     const pageBody=document.querySelector('.page-body');
     function fitA4(){
